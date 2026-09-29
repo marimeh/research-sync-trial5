@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RESEARCH SYNC - Trinity University of Asia</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tua: {
+              blue: '#1e3a8a',
+              sky: '#0284c7',
+              gold: '#eab308',
+              goldhover: '#ca8a04',
+              lightbg: '#f8fafc',
+              cardbg: '#ffffff'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .bg-tua-gradient {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.82) 0%, rgba(2, 132, 199, 0.7) 40%, rgba(234, 179, 8, 0.85) 100%),
+                  url('https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    }
+    .glass-card {
+      background: rgba(225, 235, 248, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ================= AUTH MODALS & OVERLAYS ================= -->
+  
+  <!-- 2-STEP LOGIN OVERLAY -->
+  <div id="auth-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-tua-gradient p-4">
+    
+    <!-- STEP 1: ROLE SELECTION (Matches image 1507.jpg) -->
+    <div id="login-step-1" class="glass-card rounded-2xl p-8 max-w-md w-full shadow-2xl text-center transition-all duration-300">
+      <div class="mb-6">
+        <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">RESEARCH SYNC</h2>
+        <p class="text-xs text-slate-600 font-semibold tracking-wider uppercase mt-1">Trinity University of Asia</p>
+      </div>
+
+      <p class="text-slate-700 font-medium mb-6 text-sm">How would you like to proceed?</p>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <!-- Professor Selection Card -->
+        <button onclick="selectRole('Professor')" class="bg-white hover:border-tua-blue border-2 border-transparent rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col items-center group">
+          <div class="w-16 h-16 mb-3 rounded-full bg-blue-50 flex items-center justify-center text-tua-blue group-hover:scale-110 transition-transform">
+            <i data-lucide="presentation" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-slate-800 text-sm">Professor</span>
+        </button>
+
+        <!-- Student Selection Card -->
+        <button onclick="selectRole('Student')" class="bg-white hover:border-tua-blue border-2 border-transparent rounded-xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col items-center group">
+          <div class="w-16 h-16 mb-3 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+            <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-slate-800 text-sm">Student</span>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-500">Official domain access requires <span class="font-semibold text-tua-blue">@tua.edu.ph</span> account</p>
+    </div>
+
+    <!-- STEP 2: CREDENTIALS FORM (Matches image 1506.jpg) -->
+    <div id="login-step-2" class="glass-card rounded-2xl p-8 max-w-md w-full shadow-2xl hidden transition-all duration-300">
+      <div class="flex items-center justify-between mb-6">
+        <button onclick="backToStep1()" class="text-slate-500 hover:text-slate-800 text-xs flex items-center font-semibold">
+          <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back
+        </button>
+        <span id="selected-role-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-tua-blue text-white">Student</span>
+      </div>
+
+      <h3 class="text-xl font-bold text-slate-900 text-center mb-6">RESEARCH HUB</h3>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </div>
+            <input type="text" id="login-email" required placeholder="Username or School Email"
+              class="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-tua-blue text-sm">
+          </div>
+        </div>
+
+        <div>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="key-round" class="w-5 h-5"></i>
+            </div>
+            <input type="password" id="login-password" required placeholder="Password"
+              class="w-full pl-10 pr-10 py-2.5 bg-white rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-tua-blue text-sm">
+            <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+              <i data-lucide="eye" id="password-toggle-icon" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a href="#" onclick="alert('Password reset link sent to registered school email.')" class="text-xs text-slate-600 hover:underline">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-tua-sky hover:bg-tua-blue text-white font-bold rounded-lg transition-colors shadow-md text-sm uppercase tracking-wide">
+          LOG IN
+        </button>
+      </form>
+
+      <!-- Quick Demo Access Links -->
+      <div class="mt-6 pt-4 border-t border-slate-300/60 text-center">
+        <p class="text-xs text-slate-500 mb-2">Quick Test Presets:</p>
+        <div class="flex justify-center space-x-2">
+          <button onclick="fillDemo('student')" class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-700 hover:bg-slate-50">Demo Student</button>
+          <button onclick="fillDemo('professor')" class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-700 hover:bg-slate-50">Demo Professor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH ERROR / WARNING MODAL -->
+  <div id="error-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 hidden">
+    <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-xl border-l-4 border-amber-500">
+      <div class="flex items-start">
+        <div class="p-2 bg-amber-100 rounded-full text-amber-600 mr-3">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h4 id="error-modal-title" class="font-bold text-slate-900">Unable to Log In</h4>
+          <p id="error-modal-msg" class="text-xs text-slate-600 mt-1">This account is registered under a different role.</p>
+        </div>
+      </div>
+      <div class="mt-5 text-right">
+        <button onclick="closeErrorModal()" class="px-4 py-1.5 bg-slate-800 text-white rounded text-xs font-semibold hover:bg-slate-700">
+          RETURN TO LOGIN
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP HEADER ================= -->
+  <header class="bg-tua-blue text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-tua-gold text-tua-blue font-black flex items-center justify-center text-lg shadow-inner">
+            RS
+          </div>
+          <div>
+            <h1 class="font-bold text-base tracking-wide leading-tight">RESEARCH SYNC</h1>
+            <p class="text-[10px] text-blue-200 uppercase tracking-widest">Trinity University of Asia</p>
+          </div>
+        </div>
+
+        <!-- Global Search Bar -->
+        <div class="flex-1 max-w-md mx-6 relative">
+          <div class="relative">
+            <input type="text" id="global-search-input" onkeyup="handleGlobalSearch(event)" placeholder="Search workshops, PPTs, templates, guidelines, Q&A..."
+              class="w-full pl-9 pr-4 py-1.5 bg-blue-900/50 text-white placeholder-blue-300 text-xs rounded-full border border-blue-400/30 focus:outline-none focus:bg-blue-900 focus:ring-2 focus:ring-tua-gold">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2 text-blue-300"></i>
+          </div>
+
+          <!-- Search Results Dropdown -->
+          <div id="search-results-box" class="absolute top-full mt-2 left-0 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 hidden overflow-hidden z-50 max-h-80 overflow-y-auto custom-scrollbar">
+            <div id="search-results-content" class="p-2 text-xs"></div>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs & Profile -->
+        <div class="flex items-center space-x-4">
+          <nav id="app-nav" class="hidden md:flex space-x-1 text-xs font-semibold">
+            <button id="nav-student-dashboard" onclick="switchTab('student-dashboard')" class="px-3 py-1.5 rounded-md bg-blue-800 text-white">Dashboard</button>
+            <button id="nav-directory" onclick="switchTab('directory')" class="px-3 py-1.5 rounded-md hover:bg-blue-800/60 text-blue-100">Directory</button>
+            <button id="nav-tracker" onclick="switchTab('tracker')" class="px-3 py-1.5 rounded-md hover:bg-blue-800/60 text-blue-100">Tracker</button>
+            <!-- PROFESSOR DASHBOARD TAB (Only visible to Professors) -->
+            <button id="nav-prof-dashboard" onclick="switchTab('prof-dashboard')" class="px-3 py-1.5 rounded-md hover:bg-blue-800/60 text-tua-gold font-bold hidden">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 inline mr-1"></i>Prof Overview
+            </button>
+          </nav>
+
+          <!-- User Profile & Logout -->
+          <div class="flex items-center space-x-3 border-l border-blue-700/60 pl-4">
+            <div class="text-right hidden sm:block">
+              <p id="user-display-name" class="text-xs font-bold leading-none text-white">Group 4</p>
+              <p id="user-display-role" class="text-[10px] text-tua-gold font-semibold mt-0.5">Student Account</p>
+            </div>
+            <button onclick="logout()" title="Log Out" class="p-1.5 rounded-lg bg-blue-900/60 hover:bg-red-600 text-blue-200 hover:text-white transition-colors">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT AREA ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- STUDENT DASHBOARD VIEW -->
+    <section id="view-student-dashboard" class="space-y-6">
+      
+      <!-- Top Banner / Welcome & Panda Tracker Status -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Welcome & Current Workshop Card -->
+        <div class="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-tua-gold/10 rounded-bl-full pointer-events-none"></div>
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 bg-blue-50 text-tua-blue text-xs font-bold rounded-full">NRES 2 Course</span>
+              <span class="text-xs text-slate-500 font-medium">Group 4 Research Team</span>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 mt-2">Welcome, Group 4!</h2>
+            <p class="text-xs text-slate-600 mt-1">Research Project: <span class="font-semibold text-slate-800">"Assessment of Urban Green Spaces in Trinity University"</span></p>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p class="text-[10px] uppercase font-bold text-slate-400">Current Workshop</p>
+              <h4 class="text-base font-bold text-tua-blue flex items-center">
+                Workshop 3: Data Collection
+                <span class="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">OPEN</span>
+              </h4>
+              <p class="text-xs text-slate-600 mt-0.5">2 / 3 Activities Completed</p>
+            </div>
+            <div class="flex space-x-2">
+              <button onclick="switchTab('directory')" class="px-4 py-2 bg-tua-blue hover:bg-blue-900 text-white rounded-lg text-xs font-bold transition-colors">
+                View Workshop
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panda Progress System Mascot Summary -->
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 shadow-sm border border-amber-200/80 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center">
+              <i data-lucide="smile" class="w-4 h-4 mr-1.5 text-amber-600"></i>
+              Panda Progress System
+            </h3>
+            <span id="panda-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 text-amber-800">Awake</span>
+          </div>
+
+          <!-- Live Panda Expression Graphic -->
+          <div class="my-3 flex items-center justify-center space-x-4">
+            <div id="panda-avatar-box" class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow border-2 border-amber-300 text-3xl">
+              🐼
+            </div>
+            <div>
+              <p id="panda-status-title" class="font-bold text-sm text-slate-800">"There's still work to do."</p>
+              <p id="panda-status-sub" class="text-xs text-slate-600 mt-0.5">Pending activities exist, but deadline is not immediate.</p>
+            </div>
+          </div>
+
+          <div class="bg-white/80 rounded-lg p-2 text-[10px] text-slate-600 flex justify-between border border-amber-100">
+            <span>Overall Status: <strong class="text-slate-800">In Progress</strong></span>
+            <button onclick="cyclePandaDemo()" class="text-tua-blue hover:underline font-semibold">Test Toggles</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Main Dashboard Grid (Announcements, Calendar, Submissions) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Columns: Announcements & Google Calendar -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Announcements Card -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                <i data-lucide="megaphone" class="w-4 h-4 text-tua-blue mr-2"></i>
+                Announcements
+              </h3>
+              <span class="text-xs text-slate-400">Latest Updates</span>
+            </div>
+
+            <div class="space-y-3">
+              <!-- Announcement Item 1 -->
+              <div class="p-3 bg-slate-50 rounded-xl border-l-4 border-emerald-500 flex items-start justify-between">
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">Workshop 4 is now open</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">September 28, 2026</p>
+                </div>
+                <button onclick="openAnnouncementModal('Workshop 4 is now open', 'Workshop 4 materials on Data Analysis are now published and available for viewing.')" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded shadow-sm">
+                  Read More
+                </button>
+              </div>
+
+              <!-- Announcement Item 2 -->
+              <div class="p-3 bg-slate-50 rounded-xl border-l-4 border-amber-500 flex items-start justify-between">
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">Activity 3 deadline moved</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">September 27, 2026</p>
+                </div>
+                <button onclick="openAnnouncementModal('Activity 3 deadline moved', 'The submission window for Workshop 3 Activity 3 has been extended to October 2, 2026.')" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded shadow-sm">
+                  Read More
+                </button>
+              </div>
+
+              <!-- Announcement Item 3 -->
+              <div class="p-3 bg-slate-50 rounded-xl border-l-4 border-blue-500 flex items-start justify-between">
+                <div>
+                  <h4 class="font-bold text-xs text-slate-800">System maintenance scheduled</h4>
+                  <p class="text-[11px] text-slate-500 mt-0.5">September 30, 2026 - 10:00 PM</p>
+                </div>
+                <button onclick="openAnnouncementModal('System maintenance', 'Brief 15-minute scheduled maintenance for database optimization.')" class="px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold rounded shadow-sm">
+                  Read More
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google Calendar Integration Block -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center">
+                <i data-lucide="calendar" class="w-4 h-4 text-tua-blue mr-2"></i>
+                Google Calendar
+              </h3>
+              <button onclick="addToGoogleCalendar()" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-tua-blue font-bold text-xs rounded-lg flex items-center transition-colors">
+                <i data-lucide="plus" class="w-3.5 h-3.5 mr-1"></i> Add to Google Calendar
+              </button>
+            </div>
+
+            <p class="text-xs text-slate-500 mb-3">Includes workshop schedules, activity deadlines, manuscript submissions, and oral defense dates.</p>
+
+            <!-- Calendar Schedule Visual Representation -->
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs">
+              <div class="font-bold text-slate-700 mb-2 border-b border-slate-200 pb-2 flex justify-between">
+                <span>SEPTEMBER 2026</span>
+                <span class="text-slate-400 font-normal">MON - FRI</span>
+              </div>
+              <div class="space-y-2">
+                <div class="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-slate-800">Sept 7 - Sept 11</span>
+                    <span class="ml-2 text-slate-600">• Workshop 1 & Activities 1-2</span>
+                  </div>
+                  <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Done</span>
+                </div>
+
+                <div class="p-2 bg-white rounded border border-slate-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-slate-800">Sept 14 - Sept 18</span>
+                    <span class="ml-2 text-slate-600">• Workshop 2</span>
+                  </div>
+                  <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">Done</span>
+                </div>
+
+                <div class="p-2 bg-blue-50 rounded border border-blue-200 flex justify-between items-center">
+                  <div>
+                    <span class="font-bold text-tua-blue">Sept 21 - Sept 30</span>
+                    <span class="ml-2 text-slate-700 font-semibold">• Workshop 3 & Activity 3 Submission</span>
+                  </div>
+                  <span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-bold text-[10px]">Due Soon</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Pending Submissions & Quick Navigation -->
+        <div class="space-y-6">
+          
+          <!-- Pending Submissions Card -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center">
+              <i data-lucide="clock" class="w-4 h-4 text-amber-500 mr-2"></i>
+              Pending Submissions
+            </h3>
+
+            <div class="p-4 bg-amber-50/70 rounded-xl border border-amber-200 mb-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-amber-800 uppercase">Workshop 3</span>
+                  <h4 class="font-bold text-slate-900 text-sm">Activity 3: Sample Analysis</h4>
+                  <p class="text-xs text-amber-700 font-medium mt-1">Due: Tomorrow (11:59 PM)</p>
+                </div>
+              </div>
+              <button onclick="switchTab('tracker')" class="w-full mt-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded transition-colors text-center block">
+                View Tracker
+              </button>
+            </div>
+
+            <!-- Quick Access Links -->
+            <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider mb-2">Quick Shortcuts</h4>
+            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+              <button onclick="switchTab('directory')" class="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-700 text-left border border-slate-200 flex items-center">
+                <i data-lucide="folder" class="w-4 h-4 mr-2 text-tua-blue"></i> Directory
+              </button>
+              <button onclick="switchTab('tracker')" class="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-700 text-left border border-slate-200 flex items-center">
+                <i data-lucide="bar-chart-2" class="w-4 h-4 mr-2 text-tua-blue"></i> Tracker
+              </button>
+              <button onclick="alert('Help Desk Q&A opened.')" class="p-2.5 bg-slate-50 hover:bg-slate-100 rounded-lg text-slate-700 text-left border border-slate-200 flex items-center col-span-2">
+                <i data-lucide="help-circle" class="w-4 h-4 mr-2 text-tua-blue"></i> Help Desk Q&A
+              </button>
+            </div>
+          </div>
+
+          <!-- Automated Email Notification Preview Panel -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-sm mb-2 flex items-center">
+              <i data-lucide="mail" class="w-4 h-4 text-tua-blue mr-2"></i>
+              Proactive Email Triggers
+            </h3>
+            <p class="text-xs text-slate-500 mb-3">Automatic email notifications sent to group members:</p>
+
+            <div class="space-y-1.5 text-[11px]">
+              <div class="p-2 rounded bg-slate-50 border border-slate-200 text-slate-700 flex justify-between">
+                <span>New Workshop Release</span>
+                <span class="text-tua-blue font-bold">Auto</span>
+              </div>
+              <div class="p-2 rounded bg-slate-50 border border-slate-200 text-slate-700 flex justify-between">
+                <span>3 Days Before Deadline</span>
+                <span class="text-tua-blue font-bold">Auto</span>
+              </div>
+              <div class="p-2 rounded bg-slate-50 border border-slate-200 text-slate-700 flex justify-between">
+                <span>1 Day Before Deadline</span>
+                <span class="text-tua-blue font-bold">Auto</span>
+              </div>
+              <div class="p-2 rounded bg-amber-50 border border-amber-200 text-amber-800 flex justify-between">
+                <span>Overdue / Delay Warning</span>
+                <span class="text-amber-700 font-bold">Auto</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- WORKSHOP DIRECTORY VIEW -->
+    <section id="view-directory" class="space-y-6 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">WORKSHOP DIRECTORY</h2>
+          <p class="text-xs text-slate-500">View overall research sequence, learning materials, and activity submissions.</p>
+        </div>
+      </div>
+
+      <!-- Workshop List Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Workshop 1 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">WORKSHOP 1</span>
+              <h3 class="font-bold text-base text-slate-800">Research Fundamentals</h3>
+            </div>
+            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full flex items-center">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> COMPLETED
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Period: Sept. 7 - Sept. 11</p>
+          <button onclick="openWorkshopDetail(1)" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-lg transition-colors">
+            VIEW WORKSHOP
+          </button>
+        </div>
+
+        <!-- Workshop 2 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">WORKSHOP 2</span>
+              <h3 class="font-bold text-base text-slate-800">Research Design</h3>
+            </div>
+            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full flex items-center">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 mr-1"></i> COMPLETED
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Period: Sept. 14 - Sept. 18</p>
+          <button onclick="openWorkshopDetail(2)" class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-lg transition-colors">
+            VIEW WORKSHOP
+          </button>
+        </div>
+
+        <!-- Workshop 3 -->
+        <div class="bg-white rounded-2xl p-5 shadow-sm border-2 border-tua-blue space-y-3 relative">
+          <span class="absolute -top-3 right-4 px-2.5 py-0.5 bg-tua-gold text-tua-blue text-[10px] font-black rounded-full uppercase">Active</span>
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-tua-blue uppercase">WORKSHOP 3</span>
+              <h3 class="font-bold text-base text-slate-800">Data Collection</h3>
+            </div>
+            <span class="px-2.5 py-1 bg-blue-100 text-tua-blue text-xs font-bold rounded-full">
+              OPEN
+            </span>
+          </div>
+          <p class="text-xs text-slate-600">Progress: <strong>2/3 Activities Completed</strong></p>
+          <button onclick="openWorkshopDetail(3)" class="w-full py-2 bg-tua-blue hover:bg-blue-900 text-white font-bold text-xs rounded-lg transition-colors shadow">
+            CONTINUE WORKSHOP
+          </button>
+        </div>
+
+        <!-- Workshop 4 (Locked but Visible) -->
+        <div class="bg-slate-50 rounded-2xl p-5 shadow-sm border border-slate-200 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">WORKSHOP 4</span>
+              <h3 class="font-bold text-base text-slate-700">Data Analysis</h3>
+            </div>
+            <span class="px-2.5 py-1 bg-slate-200 text-slate-600 text-xs font-bold rounded-full flex items-center">
+              <i data-lucide="lock" class="w-3 h-3 mr-1"></i> LOCKED
+            </span>
+          </div>
+          <p class="text-xs text-slate-500">Opens: October 5, 2026</p>
+          <button onclick="alert('Workshop 4 is locked until October 5. You can view sequence details when unlocked.')" class="w-full py-2 bg-slate-200 text-slate-500 font-bold text-xs rounded-lg cursor-not-allowed">
+            LOCKED
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- WORKSHOP TRACKER VIEW -->
+    <section id="view-tracker" class="space-y-6 hidden">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-2">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">MY WORKSHOP TRACKER</h2>
+            <p class="text-xs text-slate-500">Group 4 • Individual & Team Activity Milestones</p>
+          </div>
+          <div class="flex space-x-2 text-xs">
+            <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded font-semibold">✓ Completed</span>
+            <span class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded font-semibold">In Progress</span>
+            <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded font-semibold">Not Done</span>
+            <span class="px-2.5 py-1 bg-red-100 text-red-800 rounded font-semibold">Delayed</span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                <th class="p-3">Workshop</th>
+                <th class="p-3">Activity Title</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Deadline</th>
+                <th class="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="p-3 font-bold text-slate-800">Workshop 1</td>
+                <td class="p-3">Activity 1: Research Topic</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Completed</span></td>
+                <td class="p-3 text-slate-500">Sept 8</td>
+                <td class="p-3 text-right"><span class="text-slate-400">Submitted</span></td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-800">Workshop 1</td>
+                <td class="p-3">Activity 2: Research Problem</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Completed</span></td>
+                <td class="p-3 text-slate-500">Sept 9</td>
+                <td class="p-3 text-right"><span class="text-slate-400">Submitted</span></td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-800">Workshop 2</td>
+                <td class="p-3">Activity 1: Methodology</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 font-bold rounded">Completed</span></td>
+                <td class="p-3 text-slate-500">Sept 15</td>
+                <td class="p-3 text-right"><span class="text-slate-400">Submitted</span></td>
+              </tr>
+              <tr class="bg-blue-50/50">
+                <td class="p-3 font-bold text-tua-blue">Workshop 3</td>
+                <td class="p-3 font-semibold text-slate-900">Activity 3: Data Sampling Plan</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-blue-100 text-tua-blue font-bold rounded">In Progress</span></td>
+                <td class="p-3 text-amber-700 font-bold">Tomorrow</td>
+                <td class="p-3 text-right">
+                  <button onclick="openWorkshopDetail(3)" class="px-3 py-1 bg-tua-blue text-white rounded font-bold hover:bg-blue-900">Submit</button>
+                </td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-slate-400">Workshop 4</td>
+                <td class="p-3 text-slate-400">Activity 1: Statistical Analysis</td>
+                <td class="p-3"><span class="px-2 py-0.5 bg-slate-100 text-slate-600 font-bold rounded">Not Done</span></td>
+                <td class="p-3 text-slate-400">Oct 10</td>
+                <td class="p-3 text-right"><span class="text-slate-400">Locked</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFESSOR DASHBOARD VIEW (RESTRICTED ACCESS) -->
+    <section id="view-prof-dashboard" class="space-y-6 hidden">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">PROFESSOR ADMINISTRATIVE DASHBOARD</h2>
+            <p class="text-xs text-slate-500">Batch Overview Across 12 Research Groups</p>
+          </div>
+          <span class="px-3 py-1 bg-tua-gold text-tua-blue font-black text-xs rounded-full">FACULTY ACCESS ONLY</span>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 text-center">
+          <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+            <p class="text-2xl font-black text-emerald-700">7</p>
+            <p class="text-xs text-emerald-800 font-semibold">Completed Groups</p>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-xl border border-blue-200">
+            <p class="text-2xl font-black text-tua-blue">3</p>
+            <p class="text-xs text-blue-800 font-semibold">In Progress</p>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+            <p class="text-2xl font-black text-slate-700">1</p>
+            <p class="text-xs text-slate-600 font-semibold">Not Done</p>
+          </div>
+          <div class="p-4 bg-red-50 rounded-xl border border-red-200">
+            <p class="text-2xl font-black text-red-600">1</p>
+            <p class="text-xs text-red-800 font-semibold">Delayed</p>
+          </div>
+        </div>
+
+        <!-- Group Progress List -->
+        <h3 class="font-bold text-slate-800 text-sm mb-3">Group Completion Progress</h3>
+        <div class="space-y-3 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1">
+              <span>Group 1</span> <span>100%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full w-full"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1">
+              <span>Group 2</span> <span>80%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-tua-blue h-full w-[80%]"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1">
+              <span>Group 3</span> <span>60%</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-tua-blue h-full w-[60%]"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1">
+              <span>Group 4 (Current View)</span> <span>100% Materials Completed</span>
+            </div>
+            <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full w-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- WORKSHOP DETAIL MODAL -->
+  <div id="workshop-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <span class="text-[10px] font-bold text-tua-blue uppercase">WORKSHOP 3 DETAILS</span>
+          <h3 class="font-bold text-lg text-slate-900">Data Collection Procedures</h3>
+        </div>
+        <button onclick="closeWorkshopModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Section 1: Guidelines -->
+      <div class="p-3 bg-slate-50 rounded-xl space-y-2">
+        <h4 class="font-bold text-xs text-slate-800">1. GUIDELINES & INSTRUCTIONS</h4>
+        <div class="flex space-x-2">
+          <button onclick="alert('Opening Workshop Guidelines PDF...')" class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold hover:bg-slate-100">Read Guidelines</button>
+          <button onclick="alert('Viewing Activity Instructions...')" class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs font-semibold hover:bg-slate-100">View Instructions</button>
+        </div>
+      </div>
+
+      <!-- Section 2: Learning Materials (Prerequisite Check) -->
+      <div class="p-3 bg-slate-50 rounded-xl space-y-2">
+        <h4 class="font-bold text-xs text-slate-800">2. LEARNING MATERIALS</h4>
+        <div class="space-y-1 text-xs">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" checked disabled class="rounded text-tua-blue">
+            <span>PowerPoint Presentation</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" checked disabled class="rounded text-tua-blue">
+            <span>Video Lecture</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" checked disabled class="rounded text-tua-blue">
+            <span>Activity Template</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Section 3: Activities (Simultaneous Visibility) -->
+      <div class="p-3 bg-blue-50/50 border border-blue-200 rounded-xl space-y-3">
+        <h4 class="font-bold text-xs text-tua-blue">3. ACTIVITIES (SIMULTANEOUS ACCESS)</h4>
+        
+        <div class="p-2 bg-white rounded border border-slate-200 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold">Activity 1: Sampling Methodology</p>
+            <p class="text-[10px] text-emerald-600 font-semibold">✓ Ready to Submit</p>
+          </div>
+          <button onclick="alert('Submitted for Group 4!')" class="px-3 py-1 bg-tua-blue text-white rounded font-bold">Submit</button>
+        </div>
+
+        <div class="p-2 bg-white rounded border border-slate-200 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold">Activity 2: Data Collection Instruments</p>
+            <p class="text-[10px] text-emerald-600 font-semibold">✓ Completed</p>
+          </div>
+          <span class="text-emerald-600 font-bold">Done</span>
+        </div>
+      </div>
+
+      <div class="text-right pt-2 border-t">
+        <button onclick="closeWorkshopModal()" class="px-4 py-1.5 bg-slate-800 text-white font-bold text-xs rounded">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANNOUNCEMENT READ MORE MODAL -->
+  <div id="announcement-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 hidden">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-xl space-y-3">
+      <h3 id="ann-modal-title" class="font-bold text-slate-900 text-base">Announcement</h3>
+      <p id="ann-modal-body" class="text-xs text-slate-600 leading-relaxed"></p>
+      <div class="text-right pt-3">
+        <button onclick="closeAnnouncementModal()" class="px-4 py-1.5 bg-tua-blue text-white text-xs font-bold rounded">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Application Logic -->
+  <script>
+    // State Management
+    let currentRole = 'Student'; // 'Student' or 'Professor'
+    let selectedStep1Role = 'Student';
+    let isLoggedIn = false;
+
+    // Search Index Data
+    const searchDatabase = [
+      { type: 'Workshop', title: 'Workshop 1: Research Fundamentals', category: 'Workshops' },
+      { type: 'Workshop', title: 'Workshop 2: Research Design', category: 'Workshops' },
+      { type: 'Workshop', title: 'Workshop 3: Data Collection', category: 'Workshops' },
+      { type: 'PPT', title: 'Sampling Methods PPT', category: 'Workshop 2' },
+      { type: 'Template', title: 'Sampling Template File', category: 'Workshop 2' },
+      { type: 'Video', title: 'Sampling Method Video Lecture', category: 'Workshop 2' },
+      { type: 'Q&A', title: 'What sampling method should we use for small populations?', category: 'Help Desk' }
+    ];
+
+    // Panda Status Presets
+    const pandaStates = [
+      { badge: 'Sleeping', title: '"Nothing left to do."', sub: 'All current requirements completed.', emoji: '🐼💤' },
+      { badge: 'Awake', title: '"There\'s still work to do."', sub: 'Pending activities exist, but deadline is not immediate.', emoji: '🐼' },
+      { badge: 'Alert', title: '"Better finish this soon!"', sub: 'Activity deadline is near (under 24 hours).', emoji: '🐼👁️' },
+      { badge: 'Overdue', title: '"Oh no, something is overdue!"', sub: 'Delayed activity detected in workspace.', emoji: '🐼😭' }
+    ];
+    let pandaIndex = 1;
+
+    // Initialize Lucide Icons
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+
+    // Login Flow
+    function selectRole(role) {
+      selectedStep1Role = role;
+      document.getElementById('selected-role-badge').innerText = role;
+      document.getElementById('login-step-1').classList.add('hidden');
+      document.getElementById('login-step-2').classList.remove('hidden');
+    }
+
+    function backToStep1() {
+      document.getElementById('login-step-2').classList.add('hidden');
+      document.getElementById('login-step-1').classList.remove('hidden');
+    }
+
+    function fillDemo(type) {
+      if (type === 'student') {
+        selectRole('Student');
+        document.getElementById('login-email').value = 'studentname@tua.edu.ph';
+        document.getElementById('login-password').value = 'password123';
+      } else {
+        selectRole('Professor');
+        document.getElementById('login-email').value = 'professor@tua.edu.ph';
+        document.getElementById('login-password').value = 'password123';
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('login-password');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+      } else {
+        pwdInput.type = 'password';
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      
+      // Domain validation check
+      if (!email.endsWith('@tua.edu.ph') && !email.includes('tua')) {
+        showErrorModal('Invalid Domain', 'Please use your official school email address (@tua.edu.ph).');
+        return;
+      }
+
+      // Role verification check logic
+      const isStudentEmail = email.toLowerCase().includes('student');
+      const isProfEmail = email.toLowerCase().includes('prof');
+
+      if (selectedStep1Role === 'Professor' && isStudentEmail) {
+        showErrorModal('Unable to Log In', 'This account is registered as a Student. Please select "Student" to continue.');
+        return;
+      }
+
+      if (selectedStep1Role === 'Student' && isProfEmail) {
+        showErrorModal('Incorrect Account Type', 'This account is registered as a Professor. Please select "Professor" to continue.');
+        return;
+      }
+
+      // Successful Login setup
+      currentRole = selectedStep1Role;
+      isLoggedIn = true;
+
+      // Update User Interface according to role
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('user-display-role').innerText = currentRole + ' Account';
+      document.getElementById('user-display-name').innerText = currentRole === 'Student' ? 'Group 4' : 'Dr. Santos (Faculty)';
+
+      // STRICT ROLE ACCESS CONTROL
+      const profNavBtn = document.getElementById('nav-prof-dashboard');
+      if (currentRole === 'Professor') {
+        profNavBtn.classList.remove('hidden');
+        switchTab('prof-dashboard');
+      } else {
+        profNavBtn.classList.add('hidden');
+        switchTab('student-dashboard');
+      }
+    }
+
+    function showErrorModal(title, msg) {
+      document.getElementById('error-modal-title').innerText = title;
+      document.getElementById('error-modal-msg').innerText = msg;
+      document.getElementById('error-modal').classList.remove('hidden');
+    }
+
+    function closeErrorModal() {
+      document.getElementById('error-modal').classList.add('hidden');
+    }
+
+    function logout() {
+      isLoggedIn = false;
+      document.getElementById('auth-screen').classList.remove('hidden');
+      backToStep1();
+    }
+
+    // Navigation & View Switching
+    function switchTab(tabId) {
+      // Role Guard Verification
+      if (tabId === 'prof-dashboard' && currentRole !== 'Professor') {
+        alert('Access Restricted: Student accounts cannot access the Professor Dashboard.');
+        return;
+      }
+
+      // Hide all views
+      document.getElementById('view-student-dashboard').classList.add('hidden');
+      document.getElementById('view-directory').classList.add('hidden');
+      document.getElementById('view-tracker').classList.add('hidden');
+      document.getElementById('view-prof-dashboard').classList.add('hidden');
+
+      // Reset Nav Styles
+      const navBtns = document.querySelectorAll('#app-nav button');
+      navBtns.forEach(btn => btn.className = 'px-3 py-1.5 rounded-md hover:bg-blue-800/60 text-blue-100');
+
+      // Show targeted view
+      if (tabId === 'student-dashboard') {
+        document.getElementById('view-student-dashboard').classList.remove('hidden');
+        document.getElementById('nav-student-dashboard').className = 'px-3 py-1.5 rounded-md bg-blue-800 text-white font-bold';
+      } else if (tabId === 'directory') {
+        document.getElementById('view-directory').classList.remove('hidden');
+        document.getElementById('nav-directory').className = 'px-3 py-1.5 rounded-md bg-blue-800 text-white font-bold';
+      } else if (tabId === 'tracker') {
+        document.getElementById('view-tracker').classList.remove('hidden');
+        document.getElementById('nav-tracker').className = 'px-3 py-1.5 rounded-md bg-blue-800 text-white font-bold';
+      } else if (tabId === 'prof-dashboard') {
+        document.getElementById('view-prof-dashboard').classList.remove('hidden');
+        document.getElementById('nav-prof-dashboard').className = 'px-3 py-1.5 rounded-md bg-tua-gold text-tua-blue font-bold';
+      }
+    }
+
+    // Global Search Functionality
+    function handleGlobalSearch(e) {
+      const query = e.target.value.toLowerCase().trim();
+      const resultsBox = document.getElementById('search-results-box');
+      const content = document.getElementById('search-results-content');
+
+      if (!query) {
+        resultsBox.classList.add('hidden');
+        return;
+      }
+
+      const matches = searchDatabase.filter(item => 
+        item.title.toLowerCase().includes(query) || 
+        item.type.toLowerCase().includes(query) ||
+        item.category.toLowerCase().includes(query)
+      );
+
+      if (matches.length === 0) {
+        content.innerHTML = `<p class="p-3 text-slate-400 text-center">No results found for "${query}"</p>`;
+      } else {
+        content.innerHTML = matches.map(m => `
+          <div onclick="alert('Navigating to: ${m.title}') text-left" class="p-2 hover:bg-slate-100 rounded cursor-pointer border-b border-slate-100 last:border-none">
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-blue-100 text-tua-blue">${m.type}</span>
+            <p class="font-bold text-slate-800 mt-0.5">${m.title}</p>
+            <p class="text-[10px] text-slate-400">${m.category}</p>
+          </div>
+        `).join('');
+      }
+
+      resultsBox.classList.remove('hidden');
+    }
+
+    // Google Calendar Action
+    function addToGoogleCalendar() {
+      const eventTitle = encodeURIComponent("Research Sync - Activity 3 Deadline");
+      const details = encodeURIComponent("Submit Workshop 3 Activity 3 on the Research Hub.");
+      const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${details}`;
+      window.open(googleCalUrl, '_blank');
+    }
+
+    // Panda Demo Cycle Toggler
+    function cyclePandaDemo() {
+      pandaIndex = (pandaIndex + 1) % pandaStates.length;
+      const state = pandaStates[pandaIndex];
+      document.getElementById('panda-badge').innerText = state.badge;
+      document.getElementById('panda-avatar-box').innerText = state.emoji;
+      document.getElementById('panda-status-title').innerText = state.title;
+      document.getElementById('panda-status-sub').innerText = state.sub;
+    }
+
+    // Workshop Modal Functions
+    function openWorkshopDetail(num) {
+      document.getElementById('workshop-modal').classList.remove('hidden');
+    }
+
+    function closeWorkshopModal() {
+      document.getElementById('workshop-modal').classList.add('hidden');
+    }
+
+    // Announcement Modal Functions
+    function openAnnouncementModal(title, body) {
+      document.getElementById('ann-modal-title').innerText = title;
+      document.getElementById('ann-modal-body').innerText = body;
+      document.getElementById('announcement-modal').classList.remove('hidden');
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('announcement-modal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
